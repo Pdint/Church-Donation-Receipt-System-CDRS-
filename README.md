@@ -1,6 +1,7 @@
 이 프로젝트는 로컬 데이터베이스에서 교회 기부금 명세서 자동화를 위한 프로젝트임
 
 ---설계---
+
 domain: 시스템의 핵심 데이터 모델 (Entity)
 
     Member.java, Donation.java, Receipt.java

@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>전자기부금영수증 발급 신청</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h2>전자기부금영수증 발급 신청</h2>
+        
+        <div class="auth-box">
+            <h3>등록교인 인증</h3>
+            <table class="auth-table">
+                <tr>
+                    <th>성명</th>
+                    <td>
+                        <input type="text" id="name" placeholder="예) 홍길동">
+                        <small>(직분자는 알파벳을 제외)</small>
+                    </td>
+                </tr>
+                <tr>
+                    <th>생년월일</th>
+                    <td>
+                        <input type="text" id="birth" placeholder="예) 19850124">
+                        <small>(숫자만 입력)</small>
+                    </td>
+                </tr>
+                <tr>
+                    <th>휴대폰</th>
+                    <td>
+                        <div class="input-group">
+                            <input type="text" id="phone" placeholder="예) 01054321234">
+                            <button type="button" onclick="sendSms()" class="btn-blue">인증번호발송</button>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <th>인증번호</th>
+                    <td>
+                        <div class="input-group">
+                            <input type="text" id="authCode" placeholder="인증번호 입력">
+                            <span id="timer" class="timer"></span>
+                            <button type="button" onclick="verifyCode()" class="btn-blue">인증확인</button>
+                        </div>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>

@@ -35,3 +35,6 @@ out/
 
 ### VS Code ###
 .vscode/
+
+### api 같은 숨겨야 하는 설정들 ###
+application-secrets.properties

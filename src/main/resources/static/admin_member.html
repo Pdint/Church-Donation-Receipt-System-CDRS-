@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>CDRS - 교인 마스터 등록</title>
+    <style>
+        body { font-family: sans-serif; padding: 20px; }
+        .form-group { margin-bottom: 15px; }
+        label { display: inline-block; width: 120px; }
+        input { padding: 5px; width: 250px; }
+        button { padding: 10px 20px; background-color: #2196F3; color: white; border: none; cursor: pointer; }
+    </style>
+</head>
+<body>
+<h2>👥 신규 교인 마스터 등록</h2>
+<div class="form-group">
+    <label>교인 ID:</label>
+    <input type="text" id="memberId" placeholder="예: 2023001">
+</div>
+<div class="form-group">
+    <label>성함:</label>
+    <input type="text" id="name">
+</div>
+<div class="form-group">
+    <label>생년월일:</label>
+    <input type="text" id="birthDate" placeholder="6자리 (예: 040512)">
+</div>
+<div class="form-group">
+    <label>전화번호:</label>
+    <input type="text" id="phone" placeholder="010-0000-0000">
+</div>
+<button onclick="saveMember()">교인 등록</button>
+
+<script>
+    async function saveMember() {
+        const data = {
+            memberId: document.getElementById('memberId').value,
+            name: document.getElementById('name').value,
+            birthDate: document.getElementById('birthDate').value,
+            phone: document.getElementById('phone').value
+        };
+
+        const response = await fetch('/api/member', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        });
+
+        if(response.ok) {
+            alert('교인 정보가 등록되었습니다.');
+            location.reload();
+        }
+    }
+</script>
+</body>
+</html>

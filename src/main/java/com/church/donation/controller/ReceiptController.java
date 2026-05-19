@@ -46,6 +46,6 @@ public class ReceiptController {
         // 4. HTML로 데이터 전달
         model.addAttribute("data", receipt);
 
-        return "receipt.html"; // src/main/resources/templates/receipt.html.html 호출
+        return "receipt"; // src/main/resources/templates/receipt.html.html 호출
     }
 }

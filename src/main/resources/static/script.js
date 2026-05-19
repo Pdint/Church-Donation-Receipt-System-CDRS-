@@ -67,7 +67,10 @@ function startTimer() {
 /**
  * 3. 인증번호 확인 로직
  */
-function verifyCode() {
+async function verifyCode() {
+    const name = document.getElementById("name").value;         // 👈 HTML에서 이름 가져오기
+    const birth = document.getElementById("birth").value;       // 👈 HTML에서 생년월일 가져오기
+    const phone = document.getElementById("phone").value;
     const inputCode = document.getElementById("authCode").value;
 
     if (!inputCode) {
@@ -75,11 +78,33 @@ function verifyCode() {
         return;
     }
 
-    // [참고] 실제 보안을 위해서는 인증번호 확인도 백엔드에서 수행해야 합니다.
-    // 지금은 우선 프론트에서 흐름만 잡는 용도로 작성되었습니다.
-    if (timeLeft > 0) {
-        alert("인증되었습니다! 기부금 영수증 출력 페이지로 이동합니다.");
-    } else {
+    if (timeLeft <= 0) {
         alert("인증 시간이 지났습니다.");
+        return;
+    }
+
+    try {
+        const response = await fetch('/api/auth/verify', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                name: name,          // 👈 서버의 AuthVerifyRequest.name 과 매핑
+                birthDate: birth,    // 👈 서버의 AuthVerifyRequest.birthDate 와 매핑
+                phone: phone,
+                code: inputCode
+            })
+        });
+
+        if (response.ok) {
+            const memberData = await response.json();
+
+            alert("인증되었습니다! 기부금 영수증 페이지로 이동합니다.");
+            window.location.href = `/receipt/${memberData.memberId}?year=2026`;
+
+        } else {
+            alert("입력하신 정보와 일치하는 교인이 없거나 인증번호가 올바르지 않습니다.");
+        }
+    } catch (error) {
+        console.error("인증 에러:", error);
     }
 }

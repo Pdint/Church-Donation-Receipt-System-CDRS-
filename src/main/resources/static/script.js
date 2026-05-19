@@ -88,9 +88,9 @@ async function verifyCode() {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                name: name,          // 👈 서버의 AuthVerifyRequest.name 과 매핑
-                birthDate: birth,    // 👈 서버의 AuthVerifyRequest.birthDate 와 매핑
-                phone: phone,
+                name: name,          // 서버의 AuthVerifyRequest.name 과 매핑
+                birthDate: birth,    // 서버의 AuthVerifyRequest.birthDate 와 매핑
+                phone: phone,        // 서버의 AuthVerifyRequset.phone 와 매핑
                 code: inputCode
             })
         });

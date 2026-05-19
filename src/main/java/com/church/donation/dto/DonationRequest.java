@@ -1,4 +1,4 @@
-package com.church.donation.dto; // 본인의 패키지 경로에 맞게 수정하세요
+package com.church.donation.dto;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -8,8 +8,8 @@ import lombok.NoArgsConstructor;
 @Setter
 @NoArgsConstructor
 public class DonationRequest {
-    private String memberId;
-    private Long amount;
-    private String itemCode;
-    private String donationDate; // "2026-05-13" 형태의 문자열로 받기
+    private String name;          // 관리자가 화면에서 입력한 교인 성함
+    private String birthDate;     // 관리자가 화면에서 입력한 교인 생년월일(6자리)
+    private Long amount;          // 기부(헌금) 금액
+    private String donationDate;  // 정산 날짜 (예: "2026-05-19")
 }

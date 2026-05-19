@@ -1,20 +1,18 @@
 package com.church.donation.domain;
 
 import jakarta.persistence.*;
-import org.springframework.data.annotation.*;
+import lombok.Getter;
+import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
 
-@MappedSuperclass // 자식 클래스에게 이 필드들을 물려줌
-@EntityListeners(AuditingEntityListener.class) // 시간에 맞춰 자동으로 값을 넣어주겠다는 뜻
+@MappedSuperclass
+@Getter
+@EntityListeners(AuditingEntityListener.class) // 엔티티가 영속성 컨텍스트에 적재될 때 시간을 자동으로 매핑
 public abstract class BaseTimeEntity {
 
     @CreatedDate
-    @Column(updatable = false)
-    private LocalDateTime createdAt; // 👈 여기에 딱 한 번만 적습니다!
-
-    //수정 시간 추가
-    @LastModifiedDate
-    private LocalDateTime updatedAt;
+    @Column(updatable = false) // 👈 데이터가 등록된 이후에는 절대 수정(UPDATE)할 수 없도록 강제 제어
+    private LocalDateTime createdAt;
 }

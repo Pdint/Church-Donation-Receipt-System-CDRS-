@@ -79,7 +79,6 @@ function verifyCode() {
     // 지금은 우선 프론트에서 흐름만 잡는 용도로 작성되었습니다.
     if (timeLeft > 0) {
         alert("인증되었습니다! 기부금 영수증 출력 페이지로 이동합니다.");
-        // location.href = "/receipt-list.html";
     } else {
         alert("인증 시간이 지났습니다.");
     }

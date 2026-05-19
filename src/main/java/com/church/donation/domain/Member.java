@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @NoArgsConstructor
-public class Member {
+public class Member extends BaseTimeEntity {
     @Id
     private String memberId;
     private String name;

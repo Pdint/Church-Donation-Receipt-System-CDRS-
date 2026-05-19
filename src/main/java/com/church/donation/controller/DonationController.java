@@ -25,7 +25,6 @@ import java.util.stream.Collectors;
                     .map(req -> new Donation(
                             req.getMemberId(),
                             req.getAmount(),
-                            req.getItemCode(),
                             req.getDonationDate()
                     ))
                     .collect(Collectors.toList());

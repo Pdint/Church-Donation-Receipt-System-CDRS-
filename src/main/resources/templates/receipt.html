@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>기부금 영수증</title>
+    <style>
+        @page { size: A4; margin: 0; }
+        body { font-family: 'Malgun Gothic', '맑은 고딕', sans-serif; background: #525659; margin: 0; padding: 20px; display: flex; justify-content: center; }
+
+        .page { width: 210mm; min-height: 297mm; padding: 15mm 20mm; margin: 0 auto; background: white; box-shadow: 0 0 10px rgba(0,0,0,0.5); box-sizing: border-box; }
+
+        .header-top { font-size: 11px; font-weight: bold; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: flex-start; }
+        .header-top .left-text { color: #0000ff; } /* 파란색 텍스트 반영 */
+
+        .serial-box { display: inline-block; border: 1px solid #ccc; padding: 3px 10px; width: 100px; text-align: center; font-weight: normal; margin-left: 10px; }
+
+        .main-title { text-align: center; font-size: 28px; font-weight: bold; letter-spacing: 15px; margin: 10px 0; }
+        .sub-desc { font-size: 11px; display: flex; justify-content: space-between; margin-bottom: 5px; }
+
+        .section-title { font-weight: bold; font-size: 14px; margin-top: 15px; margin-bottom: 5px; }
+
+        /* 관공서 서식 특유의 표 스타일 (위아래 굵은 테두리, 내부 얇은 테두리) */
+        .form-table { width: 100%; border-top: 2px solid #000; border-bottom: 2px solid #000; border-collapse: collapse; font-size: 12px; margin-bottom: 5px; }
+        .form-table th, .form-table td { border-bottom: 1px solid #aaa; border-right: 1px solid #aaa; padding: 6px 8px; text-align: left; vertical-align: top; font-weight: normal; }
+        .form-table tr:last-child th, .form-table tr:last-child td { border-bottom: none; }
+        .form-table th:last-child, .form-table td:last-child { border-right: none; }
+
+        /* 기부내용 테이블 전용 중앙정렬 */
+        .donation-table th, .donation-table td { text-align: center; vertical-align: middle; }
+
+        .footer-text { text-align: justify; font-size: 13px; margin: 20px 0; line-height: 1.6; padding: 0 10px; }
+        .sign-box { text-align: right; font-size: 14px; margin-top: 30px; padding-right: 30px; line-height: 2.5; }
+
+        /* 화면용 인쇄 버튼 플로팅 */
+        .btn-print { position: fixed; top: 30px; right: 50px; padding: 15px 30px; background: #2196F3; color: white; border: none; border-radius: 5px; font-size: 16px; font-weight: bold; cursor: pointer; }
+        .btn-print:hover { background: #0b7dda; }
+
+        @media print {
+            body { background: white; padding: 0; display: block; }
+            .page { box-shadow: none; margin: 0; padding: 15mm; }
+            .btn-print { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+<button class="btn-print" onclick="window.print()">🖨️ 영수증 인쇄하기</button>
+
+<div class="page">
+    <div class="header-top">
+        <span class="left-text">■ 소득세법 시행규칙 [별지 제45호의2서식] &lt;개정 2022. 3. 18.&gt;</span>
+    </div>
+
+    <div style="display: flex; align-items: center;">
+        <div style="font-size: 12px;">일련번호 <span class="serial-box">[작성필요]</span></div>
+        <div style="flex-grow: 1;">
+            <div class="main-title">기부금 영수증</div>
+        </div>
+    </div>
+
+    <div class="sub-desc">
+        <span>※ 뒤쪽의 작성방법을 읽고 작성하여 주시기 바랍니다.</span>
+        <span>(앞 쪽)</span>
+    </div>
+
+    <div class="section-title">❶ 기 부 자</div>
+    <table class="form-table">
+        <tr>
+            <td style="width: 50%;">성명(법인명)<br><br><span style="font-weight: bold;" th:text="${data.name}">홍길동</span></td>
+            <td style="width: 50%;">주민등록번호<br>(사업자등록번호)<br><span th:text="${data.birthDate} + '-'">000101-*******</span></td>
+        </tr>
+        <tr>
+            <td colspan="2">주소(소재지)<br><br></td>
+        </tr>
+    </table>
+
+    <div class="section-title">❷ 기부금 단체</div>
+    <table class="form-table">
+        <tr>
+            <td style="width: 50%;">단 체 명<br><br>ㅇㅇ교회</td>
+            <td style="width: 50%;">사업자등록번호(고유번호)<br><br>123-45-67890</td>
+        </tr>
+        <tr>
+            <td>(지점명)<br><br></td>
+            <td>(지점 사업자등록번호 등)<br><br></td>
+        </tr>
+        <tr>
+            <td>소 재 지<br><br>경상북도 구미시 ㅇㅇ로 123</td>
+            <td rowspan="2">기부금공제대상<br>기부금단체 근거법령:<br>법인세법 시행령 제39조 제1항 제1호마목</td>
+        </tr>
+        <tr>
+            <td>(지점 소재지)<br><br></td>
+        </tr>
+    </table>
+    <div style="font-size: 11px; margin-bottom: 10px;">* 기부금 단체의 지점(분사무소)이 기부받은 경우, 지점명 등을 추가로 기재할 수 있습니다.</div>
+
+    <div class="section-title">❸ 기부금 모집처(언론기관 등)</div>
+    <table class="form-table">
+        <tr>
+            <td style="width: 50%;">단 체 명<br><br></td>
+            <td style="width: 50%;">사업자등록번호<br><br></td>
+        </tr>
+        <tr>
+            <td colspan="2">소 재 지<br><br></td>
+        </tr>
+    </table>
+
+    <div class="section-title">❹ 기부내용</div>
+    <table class="form-table donation-table">
+        <thead>
+        <tr>
+            <th rowspan="2" style="width: 8%;">코 드</th>
+            <th rowspan="2" style="width: 15%;">구 분<br>(금전 또는<br>현물)</th>
+            <th rowspan="2" style="width: 17%;">연월일</th>
+            <th colspan="3">내 용</th>
+            <th rowspan="2" style="width: 20%;">금 액</th>
+        </tr>
+        <tr>
+            <th style="border-top: 1px solid #aaa;">품명</th>
+            <th style="border-top: 1px solid #aaa;">수량</th>
+            <th style="border-top: 1px solid #aaa;">단가</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr style="height: 35px;">
+            <td th:text="${data.itemCode}">41</td>
+            <td>각종 헌금</td>
+            <td th:text="${data.dateRange}">2022. 1~12</td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td style="text-align: right; padding-right: 15px;" th:text="${#numbers.formatInteger(data.totalAmount, 0, 'COMMA')}">0</td>
+        </tr>
+        <tr style="height: 35px;"><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+        <tr style="height: 35px;"><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+        <tr style="height: 35px;"><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+        <tr style="height: 35px;"><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+        </tbody>
+    </table>
+
+    <div class="footer-text">
+        「소득세법」 제34조, 「조세특례제한법」 제76조 ㆍ 제88조의4 및 「법인세법」 제24조에 따른 기부금을 위와 같이 기부하였음을 증명하여 주시기 바랍니다.
+    </div>
+
+    <div class="sign-box">
+        <div style="text-align: center; display: inline-block; width: 100%;">
+            <span style="float: right;">년 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 월 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 일</span>
+        </div>
+        <div style="text-align: center; display: inline-block; width: 100%;">
+            신청인 <span style="float: right; margin-right: 50px;">(서명 또는 인)</span>
+        </div>
+        <hr style="border-top: 1px solid #aaa; margin: 10px 0;">
+        <div style="text-align: left;">위와 같이 기부금을 기부받았음을 증명합니다.</div>
+        <div style="text-align: center; display: inline-block; width: 100%;">
+            <span style="float: right;">년 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 월 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 일</span>
+        </div>
+        <div style="text-align: center; display: inline-block; width: 100%;">
+            기부금 수령인 <span style="float: right; margin-right: 50px;">(서명 또는 인)</span>
+        </div>
+    </div>
+
+    <div style="text-align: right; font-size: 10px; margin-top: 20px;">
+        210mm×297mm[백상지 80g/m² 또는 중질지 80g/m²]
+    </div>
+</div>
+
+</body>
+</html>

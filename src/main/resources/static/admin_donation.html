@@ -33,14 +33,12 @@
     <tr>
         <th>교인 ID</th>
         <th>기부 금액</th>
-        <th>항목 코드</th>
     </tr>
     </thead>
     <tbody id="donationBody">
     <tr>
         <td><input type="text" class="memberId" placeholder="ID 입력"></td>
         <td><input type="number" class="amount" placeholder="금액"></td>
-        <td><input type="text" class="itemCode" value="41"></td>
     </tr>
     </tbody>
 </table>
@@ -63,7 +61,6 @@
             amount: parseInt(row.querySelector('.amount').value),
             phone: row.querySelector('.phone').value,
             birthDate: row.querySelector('.birthDate').value,
-            itemCode: row.querySelector('.itemCode').value
         }));
 
         const response = await fetch('/api/donation/batch', {

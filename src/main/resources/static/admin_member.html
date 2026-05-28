@@ -33,11 +33,15 @@
 
 <script>
     async function saveMember() {
+        // 입력받은 전화번호에서 모든 하이픈(-)을 빈 문자열로 치환(제거)합니다. (정규화)
+        const rawPhone = document.getElementById('phone').value;
+        const cleanPhone = rawPhone.replace(/-/g, '');
+
         const data = {
             memberId: document.getElementById('memberId').value,
             name: document.getElementById('name').value,
             birthDate: document.getElementById('birthDate').value,
-            phone: document.getElementById('phone').value
+            phone: cleanPhone // 정제된 번호를 데이터에 담습니다.
         };
 
         const response = await fetch('/api/member', {

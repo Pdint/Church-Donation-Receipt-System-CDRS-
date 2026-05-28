@@ -7,7 +7,8 @@ let timerInterval;
  */
 async function sendSms() {
     const name = document.getElementById("name").value;
-    const phone = document.getElementById("phone").value;
+    // 👈 문자 발송 시에도 하이픈 제거
+    const phone = document.getElementById("phone").value.replace(/-/g, '');
 
     if (!name || !phone) {
         alert("성명과 휴대폰 번호를 모두 입력해주세요.");
@@ -68,11 +69,10 @@ function startTimer() {
  * 3. 인증번호 확인 로직
  */
 async function verifyCode() {
-    const name = document.getElementById("name").value;         // 👈 HTML에서 이름 가져오기
-    const birth = document.getElementById("birth").value;       // 👈 HTML에서 생년월일 가져오기
-    const phone = document.getElementById("phone").value;
+    const name = document.getElementById("name").value; // html에서 name 가져옴
+    const birth = document.getElementById("birth").value; // html에서 생일 가져옴
+    const phone = document.getElementById("phone").value.replace(/-/g, ''); // 인증 확인 시에도 하이픈 제거하여 DB와 매칭
     const inputCode = document.getElementById("authCode").value;
-
     if (!inputCode) {
         alert("인증번호를 입력해주세요.");
         return;

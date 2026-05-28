@@ -4,15 +4,31 @@
     <meta charset="UTF-8">
     <title>CDRS - 기부 내역 일괄 입력</title>
     <style>
+        body { font-family: 'Malgun Gothic', sans-serif; padding: 20px; }
+
+        /* 👈 상단 헤더 영역을 가로로 배치하기 위한 Flexbox 스타일 추가 */
+        .header-container { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .header-container h2 { margin: 0; }
+
+        /* 👈 하이퍼링크를 예쁜 버튼 모양으로 꾸미는 스타일 */
+        .link-btn { text-decoration: none; background-color: #2196F3; color: white; padding: 10px 15px; border-radius: 5px; font-weight: bold; font-size: 14px; transition: background 0.3s; }
+        .link-btn:hover { background-color: #0b7dda; }
+
         table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
         th, td { border: 1px solid #ddd; padding: 10px; text-align: center; }
         input { width: 90%; padding: 5px; border: 1px solid #ccc; }
+
+        .header-panel { margin-bottom: 20px; }
         .btn-group { margin-bottom: 20px; }
-        button { padding: 8px 15px; cursor: pointer; }
+        button { padding: 8px 15px; cursor: pointer; border-radius: 3px; border: 1px solid #ccc; }
     </style>
 </head>
 <body>
-<h2>⛪ 기부 정산 내역 일괄 입력</h2>
+
+<div class="header-container">
+    <h2>⛪ 기부 정산 내역 일괄 입력</h2>
+    <a href="admin_member.html" class="link-btn">👥 신규 교인 등록 가기</a>
+</div>
 
 <div class="header-panel">
     <strong>📅 정산(기부) 날짜 선택:</strong>
@@ -24,7 +40,7 @@
 
 <div class="btn-group">
     <button onclick="addRow()">➕ 행 추가</button>
-    <button onclick="submitDonations()" style="background-color: #4CAF50; color: white;">💾 전체 저장</button>
+    <button onclick="submitDonations()" style="background-color: #4CAF50; color: white; border: none;">💾 전체 저장</button>
 </div>
 
 <table id="donationTable">
@@ -38,8 +54,8 @@
     <tbody id="donationBody">
     <tr>
         <td><input type="text" class="name" placeholder="성함"></td>
-        <td><input type="text" class="birthDate" placeholder="생년월일"></td>
-        <td><input type="number" class="amount" placeholder="기부금액"></td>
+        <td><input type="text" class="birthDate" placeholder="6자리 (예: 900101)"></td>
+        <td><input type="number" class="amount" placeholder="금액"></td>
     </tr>
     </tbody>
 </table>
@@ -50,31 +66,51 @@
         const newRow = tbody.rows[0].cloneNode(true);
         // 입력값 초기화
         const inputs = newRow.getElementsByTagName('input');
-        for(let i=0; i<inputs.length-1; i++) inputs[i].value = '';
+        for(let i=0; i<inputs.length; i++) inputs[i].value = '';
         tbody.appendChild(newRow);
     }
 
     async function submitDonations() {
+        // 날짜 검증
+        const dateInput = document.getElementById('settlementDate').value;
+        if (!dateInput) {
+            alert('정산(기부) 날짜를 먼저 선택해주세요!');
+            return;
+        }
+
         const rows = document.querySelectorAll('#donationBody tr');
         const data = Array.from(rows).map(row => ({
             name: row.querySelector('.name').value,
-            memberId: row.querySelector('.memberId').value,
-            amount: parseInt(row.querySelector('.amount').value),
-            phone: row.querySelector('.phone').value,
             birthDate: row.querySelector('.birthDate').value,
+            amount: parseInt(row.querySelector('.amount').value),
+            donationDate: dateInput // 공통 날짜 적용
         }));
 
-        const response = await fetch('/api/donation/batch', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(data)
-        });
+        // 빈 값 검증
+        for (let req of data) {
+            if (!req.name || !req.birthDate || isNaN(req.amount)) {
+                alert('모든 칸(성함, 생년월일, 금액)을 정확히 입력해주세요.');
+                return;
+            }
+        }
 
-        if (response.ok) {
-            alert('모든 내역이 성공적으로 저장되었습니다!');
-            location.reload();
-        } else {
-            alert('저장에 실패했습니다. 데이터를 확인해주세요.');
+        try {
+            const response = await fetch('/api/donation/batch', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+
+            if (response.ok) {
+                alert('모든 내역이 성공적으로 저장되었습니다!');
+                location.reload();
+            } else {
+                const errorText = await response.text();
+                alert('저장 실패: ' + errorText);
+            }
+        } catch (error) {
+            alert('서버 통신 오류가 발생했습니다.');
+            console.error(error);
         }
     }
 </script>

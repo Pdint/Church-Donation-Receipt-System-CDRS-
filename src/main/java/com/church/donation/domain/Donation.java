@@ -8,6 +8,7 @@ import java.time.LocalDate;
 @Entity
 @Getter
 @NoArgsConstructor
+
 public class Donation extends BaseTimeEntity { // 👈 상속을 통해 중복 등록 시간 코드 완벽 제거!
 
     @Id

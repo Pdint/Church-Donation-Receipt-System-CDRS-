@@ -4,16 +4,14 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-import org.hibernate.annotations.CreationTimestamp;
-
 import java.time.LocalDateTime;
 
-@MappedSuperclass
+@MappedSuperclass // 부모 클래스로 쓸 수 있게 해줌
 @Getter
-//@EntityListeners(AuditingEntityListener.class) // 엔티티가 영속성 컨텍스트에 적재될 때 시간을 자동으로 매핑
+@EntityListeners(AuditingEntityListener.class) // 스프링이 감시하다가 시간을 넣어줌
 public abstract class BaseTimeEntity {
 
-    @CreationTimestamp
-    @Column(updatable = false) // 👈 데이터가 등록된 이후에는 절대 수정(UPDATE)할 수 없도록 강제 제어
+    @CreatedDate
+    @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
 }

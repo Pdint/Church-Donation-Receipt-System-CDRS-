@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @NoArgsConstructor
-public class Member extends BaseTimeEntity { //  공통 등록 시간 상속
+public class Member extends BaseTimeEntity {
 
     @Id
     private String memberId; // 시스템 내부적으로 사람을 구별하는 절대 고유 Primary Key

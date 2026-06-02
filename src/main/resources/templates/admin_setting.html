@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>교회 정보 설정</title>
+    <style>
+        /* 외부 CSS 차단 대비용 내장 스타일 (절대 안 깨짐!) */
+        body {
+            font-family: 'Malgun Gothic', 'Apple SD Gothic Neo', sans-serif;
+            background-color: #f4f7f6; /* 눈이 편안한 관리자 페이지용 배경색 */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .settings-container {
+            background-color: white;
+            padding: 40px;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+            width: 100%;
+            max-width: 450px;
+            box-sizing: border-box;
+        }
+        h2 {
+            color: #2c3e50;
+            margin-top: 0;
+            margin-bottom: 8px;
+            text-align: center;
+            font-size: 1.8rem;
+        }
+        p.subtitle {
+            color: #7f8c8d;
+            font-size: 0.95rem;
+            text-align: center;
+            margin-bottom: 25px;
+        }
+        .success-msg {
+            background-color: #e8f8f5;
+            color: #1abc9c;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 0.95rem;
+            font-weight: bold;
+            border-left: 5px solid #1abc9c;
+            text-align: center;
+            box-shadow: 0 2px 5px rgba(26, 188, 156, 0.1);
+        }
+        .input-group {
+            margin-bottom: 20px;
+        }
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #34495e;
+            font-size: 0.9rem;
+        }
+        .input-group input {
+            width: 100%;
+            padding: 14px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-sizing: border-box;
+            font-size: 1rem;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .input-group input:focus {
+            border-color: #3498db;
+            box-shadow: 0 0 5px rgba(52, 152, 219, 0.3);
+            outline: none;
+        }
+        .btn-save {
+            background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
+            color: white;
+            border: none;
+            padding: 15px;
+            width: 100%;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.1s, box-shadow 0.2s;
+            margin-top: 10px;
+            box-shadow: 0 4px 15px rgba(46, 204, 113, 0.3);
+        }
+        .btn-save:hover {
+            opacity: 0.95;
+            box-shadow: 0 6px 20px rgba(46, 204, 113, 0.4);
+        }
+        .btn-save:active {
+            transform: translateY(2px);
+        }
+        .back-link {
+            display: block;
+            text-align: center;
+            margin-top: 20px;
+            color: #95a5a6;
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: bold;
+            transition: color 0.2s;
+        }
+        .back-link:hover {
+            color: #34495e;
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+
+<div class="settings-container">
+    <h2>🏢 교회 정보 설정</h2>
+    <p class="subtitle">기부금 영수증에 출력될 공식 정보를 관리합니다.</p>
+
+    <div th:if="${param.success}" class="success-msg">
+        ✅ 교회 정보가 성공적으로 덮어쓰기 되었습니다!
+    </div>
+
+    <form action="/admin/settings" method="post">
+        <div class="input-group">
+            <label for="name">교회명</label>
+            <input type="text" id="name" name="name" th:value="${churchInfo.name}" placeholder="예: 서울은혜교회" required>
+        </div>
+
+        <div class="input-group">
+            <label for="repName">대표자명 (담임목사)</label>
+            <input type="text" id="repName" name="repName" th:value="${churchInfo.repName}" placeholder="예: 홍길동" required>
+        </div>
+
+        <div class="input-group">
+            <label for="businessNo">고유번호 (사업자번호)</label>
+            <input type="text" id="businessNo" name="businessNo" th:value="${churchInfo.businessNo}" placeholder="예: 123-82-45678" required>
+        </div>
+
+        <div class="input-group">
+            <label for="address">주소</label>
+            <input type="text" id="address" name="address" th:value="${churchInfo.address}" placeholder="예: 서울특별시 강남구 테헤란로 123" required>
+        </div>
+
+        <div class="input-group">
+            <label for="serialNumber">영수증 일련번호 (발급번호)</label>
+            <input type="text" id="serialNumber" name="serialNumber" th:value="${churchInfo.serialNumber}" placeholder="예: 2026-0001" required>
+        </div>
+
+        <button type="submit" class="btn-save">정보 저장 (덮어쓰기)</button>
+    </form>
+
+    <a href="/admin_main.html" class="back-link"> 관리자 대시보드로 돌아가기</a>
+</div>
+
+</body>
+</html>

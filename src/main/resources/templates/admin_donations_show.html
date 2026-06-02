@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="">
+<head>
+    <meta charset="UTF-8">
+    <title>헌금 내역 관리</title>
+    <style>
+        body { font-family: 'Malgun Gothic', sans-serif; padding: 20px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; text-align: center; }
+        th, td { border: 1px solid #ddd; padding: 12px; }
+        th { background-color: #f4f6f8; font-weight: bold; }
+        .btn-excel {
+            background-color: #1D6F42;
+            color: white; padding: 10px 15px;
+            text-decoration: none; border-radius: 5px; font-weight: bold;
+        }
+        .btn-excel:hover { background-color: #144c2d; }
+
+        /* 금액 부분은 보기 편하게 오른쪽 정렬 */
+        .amount-col { text-align: right; padding-right: 20px; font-weight: bold; color: #d93025; }
+    </style>
+</head>
+<body>
+<h2>💰 전체 헌금(기부) 내역</h2>
+
+<a href="/admin/donations/excel" class="btn-excel">💾 엑셀로 다운로드</a>
+
+<table>
+    <thead>
+    <tr>
+        <th>교인 ID</th>
+        <th>기부 금액</th>
+        <th>기부 날짜 (입력일)</th>
+        <th>시스템 기록 시간</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="donation : ${donations}">
+        <td th:text="${donation.memberId}"></td>
+
+        <td class="amount-col" th:text="${#numbers.formatInteger(donation.amount, 0, 'COMMA')} + ' 원'"></td>
+
+        <td th:text="${donation.donationDate}"></td>
+
+        <td th:text="${donation.createdAt != null ? #temporals.format(donation.createdAt, 'yyyy-MM-dd HH:mm') : ''}"></td>
+    </tr>
+    </tbody>
+</table>
+</body>
+</html>

@@ -10,10 +10,6 @@
         .header-container { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
         .header-container h2 { margin: 0; }
 
-        /* 👈 하이퍼링크를 예쁜 버튼 모양으로 꾸미는 스타일 */
-        .link-btn { text-decoration: none; background-color: #2196F3; color: white; padding: 10px 15px; border-radius: 5px; font-weight: bold; font-size: 14px; transition: background 0.3s; }
-        .link-btn:hover { background-color: #0b7dda; }
-
         table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
         th, td { border: 1px solid #ddd; padding: 10px; text-align: center; }
         input { width: 90%; padding: 5px; border: 1px solid #ccc; }
@@ -27,12 +23,11 @@
 
 <div class="header-container">
     <h2>⛪ 기부 정산 내역 일괄 입력</h2>
-    <a href="admin_member.html" class="link-btn">👥 신규 교인 등록 가기</a>
 </div>
 
 <div class="header-panel">
     <strong>📅 정산(기부) 날짜 선택:</strong>
-    <input type="date" id="settlementDate" style="width: 200px;">
+    <label for="settlementDate"></label><input type="date" id="settlementDate" style="width: 200px;">
     <p style="font-size: 0.85em; color: #666; margin-top: 5px;">
         * 선택한 날짜가 아래 모든 내역에 공통으로 적용됩니다.
     </p>
@@ -53,9 +48,15 @@
     </thead>
     <tbody id="donationBody">
     <tr>
-        <td><input type="text" class="name" placeholder="성함"></td>
-        <td><input type="text" class="birthDate" placeholder="6자리 (예: 900101)"></td>
-        <td><input type="number" class="amount" placeholder="금액"></td>
+        <td><label>
+            <input type="text" class="name" placeholder="성함">
+        </label></td>
+        <td><label>
+            <input type="text" class="birthDate" placeholder="6자리 (예: 900101)">
+        </label></td>
+        <td><label>
+            <input type="number" class="amount" placeholder="금액">
+        </label></td>
     </tr>
     </tbody>
 </table>

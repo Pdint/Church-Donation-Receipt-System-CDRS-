@@ -52,7 +52,7 @@
     </div>
 
     <div style="display: flex; align-items: center;">
-        <div style="font-size: 12px;">일련번호 <span class="serial-box">[작성필요]</span></div>
+        <div style="font-size: 12px;">일련번호 <span class="serial-box"><span th:text="${church.serialNumber}">작성 필요</span></span></div>
         <div style="flex-grow: 1;">
             <div class="main-title">기부금 영수증</div>
         </div>
@@ -77,15 +77,15 @@
     <div class="section-title">❷ 기부금 단체</div>
     <table class="form-table">
         <tr>
-            <td style="width: 50%;">단 체 명<br><br>ㅇㅇ교회</td>
-            <td style="width: 50%;">사업자등록번호(고유번호)<br><br>123-45-67890</td>
+            <td style="width: 50%;">단 체 명<br><br><span th:text="${church.name}">ㅇㅇ교회</span></td>
+            <td style="width: 50%;">사업자등록번호(고유번호)<br><br><span th:text="${church.businessNo}">123-45-789</span></td>
         </tr>
         <tr>
             <td>(지점명)<br><br></td>
             <td>(지점 사업자등록번호 등)<br><br></td>
         </tr>
         <tr>
-            <td>소 재 지<br><br>경상북도 구미시 ㅇㅇ로 123</td>
+            <td>소 재 지<br><br><span th:text="${church.address}">경상북도 구미시 ㅇㅇ로 123</span></td>
             <td rowspan="2">기부금공제대상<br>기부금단체 근거법령:<br>법인세법 시행령 제39조 제1항 제1호마목</td>
         </tr>
         <tr>
@@ -129,7 +129,7 @@
             <td></td>
             <td></td>
             <td></td>
-            <td style="text-align: right; padding-right: 15px;" th:text="${#numbers.formatInteger(data.totalAmount, 0, 'COMMA')}">0</td>
+            <td style="text-align: right; padding-right: 15px;" th:text="${data?.totalAmount != null ? #numbers.formatInteger(data.totalAmount, 0, 'COMMA') : '0'}">0</td>
         </tr>
         <tr style="height: 35px;"><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
         <tr style="height: 35px;"><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>

@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="">
+<head>
+    <meta charset="UTF-8">
+    <title>교인 명부 관리</title>
+    <style>
+        body { font-family: 'Malgun Gothic', sans-serif; padding: 20px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; text-align: center; }
+        th, td { border: 1px solid #ddd; padding: 12px; }
+        th { background-color: #f4f6f8; font-weight: bold; }
+        .btn-excel {
+            background-color: #1D6F42; /* 엑셀의 상징 초록색! */
+            color: white; padding: 10px 15px;
+            text-decoration: none; border-radius: 5px; font-weight: bold;
+        }
+        .btn-excel:hover { background-color: #144c2d; }
+    </style>
+</head>
+<body>
+<h2>📋 전체 교인 명부</h2>
+
+<a href="/admin/members/excel" class="btn-excel">💾 엑셀로 다운로드</a>
+
+<table>
+    <thead>
+    <tr>
+        <th>교인 ID</th>
+        <th>이름</th>
+        <th>생년월일</th>
+        <th>전화번호</th>
+        <th>가입일자</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="member : ${members}">
+        <td th:text="${member.memberId}"></td>
+        <td th:text="${member.name}"></td>
+        <td th:text="${member.birthDate}"></td>
+        <td th:text="${member.phone}"></td>
+        <td th:text="${#temporals.format(member.createdAt, 'yyyy-MM-dd HH:mm')}"></td>
+    </tr>
+    </tbody>
+</table>
+</body>
+</html>

@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API 연동 설정</title>
+    <style>
+        body {
+            font-family: 'Malgun Gothic', 'Apple SD Gothic Neo', sans-serif;
+            background-color: #f8f9fa;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .settings-container {
+            background-color: white;
+            padding: 40px;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+            width: 100%;
+            max-width: 500px;
+            box-sizing: border-box;
+            border-top: 5px solid #8e44ad; /* API 설정창은 보라색 포인트! */
+        }
+        h2 { color: #2c3e50; margin-top: 0; margin-bottom: 8px; text-align: center; }
+        p.subtitle { color: #7f8c8d; font-size: 0.95rem; text-align: center; margin-bottom: 25px; }
+
+        .success-msg {
+            background-color: #e8f8f5; color: #1abc9c; padding: 15px; border-radius: 8px;
+            margin-bottom: 20px; font-size: 0.95rem; font-weight: bold;
+            border-left: 5px solid #1abc9c; text-align: center;
+        }
+        .warning-msg {
+            background-color: #fef9e7; color: #d35400; padding: 12px; border-radius: 8px;
+            margin-bottom: 20px; font-size: 0.85rem; text-align: center; border: 1px solid #fad7a1;
+        }
+
+        .input-group { margin-bottom: 20px; }
+        .input-group label { display: block; margin-bottom: 8px; font-weight: bold; color: #34495e; font-size: 0.9rem; }
+        .input-group input {
+            width: 100%; padding: 14px; border: 1px solid #ddd; border-radius: 8px;
+            box-sizing: border-box; font-size: 1rem; transition: border-color 0.2s;
+        }
+        .input-group input:focus { border-color: #8e44ad; outline: none; }
+
+        .btn-save {
+            background: linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%); color: white;
+            border: none; padding: 15px; width: 100%; border-radius: 8px;
+            font-size: 1.1rem; font-weight: bold; cursor: pointer; margin-top: 10px;
+        }
+        .btn-save:hover { opacity: 0.95; }
+
+        .back-link { display: block; text-align: center; margin-top: 20px; color: #95a5a6; text-decoration: none; font-weight: bold; }
+        .back-link:hover { color: #34495e; text-decoration: underline; }
+    </style>
+</head>
+<body>
+
+<div class="settings-container">
+    <h2>⚙️ 외부 API 연동 설정</h2>
+    <p class="subtitle">문자(SMS) 발송을 위한 연동 키를 관리합니다.</p>
+
+    <div th:if="${param.success}" class="success-msg">
+        ✅ API 연동 설정이 성공적으로 저장되었습니다!
+    </div>
+
+    <div class="warning-msg">
+        ⚠️ <b>보안 주의:</b> API Key와 Secret은 절대 외부에 노출되지 않도록 주의하세요.
+    </div>
+
+    <form action="/admin/api-settings" method="post">
+        <div class="input-group">
+            <label for="smsApiKey">SMS API Key (예: Solapi)</label>
+            <input type="text" id="smsApiKey" name="smsApiKey" th:value="${apiSettings.smsApiKey}" placeholder="발급받은 API Key 입력">
+        </div>
+
+        <div class="input-group">
+            <label for="smsApiSecret">SMS API Secret</label>
+            <input type="password" id="smsApiSecret" name="smsApiSecret" th:value="${apiSettings.smsApiSecret}" placeholder="발급받은 API Secret 입력">
+        </div>
+
+        <div class="input-group">
+            <label for="senderNumber">기본 발신자 번호 (숫자만)</label>
+            <input type="text" id="senderNumber" name="senderNumber" th:value="${apiSettings.senderNumber}" placeholder="예: 01012345678">
+        </div>
+
+        <button type="submit" class="btn-save">API 설정 저장</button>
+    </form>
+
+    <a href="/admin_main.html" class="back-link">⬅️ 관리자 대시보드로 돌아가기</a>
+</div>
+
+</body>
+</html>

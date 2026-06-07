@@ -28,7 +28,8 @@
         <th>이름</th>
         <th>생년월일</th>
         <th>전화번호</th>
-        <th>가입일자</th>
+        <th>작성일자</th>
+        <th>관리</th>
     </tr>
     </thead>
     <tbody>
@@ -38,8 +39,18 @@
         <td th:text="${member.birthDate}"></td>
         <td th:text="${member.phone}"></td>
         <td th:text="${#temporals.format(member.createdAt, 'yyyy-MM-dd HH:mm')}"></td>
+        <td>
+            <form th:action="@{/admin/members/delete/{id}(id=${member.memberId})}" method="post" style="display:inline;">
+                <button type="submit"
+                        onclick="return confirm('🚨 경고: 이 교인을 삭제하면 관련된 [모든 헌금 내역]도 함께 영구 삭제됩니다. 정말 지우시겠습니까?');"
+                        style="background-color: #e74c3c; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-weight: bold;">
+                    교인 삭제
+                </button>
+            </form>
+        </td>
     </tr>
     </tbody>
+
 </table>
 </body>
 </html>

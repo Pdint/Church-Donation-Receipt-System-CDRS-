@@ -31,8 +31,9 @@
         <th>기부 금액</th>
         <th>기부 날짜 (입력일)</th>
         <th>시스템 기록 시간</th>
-    </tr>
+        <th>관리</th> </tr>
     </thead>
+
     <tbody>
     <tr th:each="donation : ${donations}">
         <td th:text="${donation.memberId}"></td>
@@ -42,8 +43,18 @@
         <td th:text="${donation.donationDate}"></td>
 
         <td th:text="${donation.createdAt != null ? #temporals.format(donation.createdAt, 'yyyy-MM-dd HH:mm') : ''}"></td>
+        <td>
+            <form th:action="@{/admin/donations/delete/{id}(id=${donation.id})}" method="post" style="display:inline;">
+                <button type="submit"
+                        onclick="return confirm('⚠️ 정말 이 기부금 내역을 삭제하시겠습니까? (복구 불가)');"
+                        style="background-color: #e74c3c; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-size: 12px;">
+                    삭제
+                </button>
+            </form>
+        </td>
     </tr>
     </tbody>
+
 </table>
 </body>
 </html>

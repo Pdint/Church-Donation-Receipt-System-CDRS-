@@ -5,6 +5,7 @@ import com.church.donation.dto.MonthlyStat;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -19,4 +20,8 @@ public interface DonationRepository extends JpaRepository<Donation, Long> {
             "FROM Donation d WHERE YEAR(d.donationDate) = :year " +
             "GROUP BY MONTH(d.donationDate) ORDER BY month")
     List<MonthlyStat> findMonthlyTotalByYear(@Param("year") int year);
+
+    // 특정 교인의 모든 기부금 내역을 한 번에 삭제하는 마법의 메서드
+    @Transactional
+    void deleteByMemberId(String memberId);
 }

@@ -33,15 +33,25 @@
 
 <script>
     async function saveMember() {
-        // 입력받은 전화번호에서 모든 하이픈(-)을 빈 문자열로 치환(제거)합니다. (정규화)
-        const rawPhone = document.getElementById('phone').value;
+        // 1. 입력값 가져오기 (trim()을 써서 띄어쓰기만 입력한 것도 걸러냅니다)
+        const memberId = document.getElementById('memberId').value.trim();
+        const name = document.getElementById('name').value.trim();
+        const birthDate = document.getElementById('birthDate').value.trim();
+        const rawPhone = document.getElementById('phone').value.trim();
+
+        // 🚨 [예외 처리] 프론트엔드 빈 값 체크
+        if (!memberId || !name || !birthDate || !rawPhone) {
+            alert('⚠️ 모든 항목을 빈칸 없이 기입해 주세요.');
+            return; // 여기서 함수를 종료하여 서버로 넘어가지 않게 막음!
+        }
+
         const cleanPhone = rawPhone.replace(/-/g, '');
 
         const data = {
-            memberId: document.getElementById('memberId').value,
-            name: document.getElementById('name').value,
-            birthDate: document.getElementById('birthDate').value,
-            phone: cleanPhone // 정제된 번호를 데이터에 담습니다.
+            memberId: memberId,
+            name: name,
+            birthDate: birthDate,
+            phone: cleanPhone
         };
 
         const response = await fetch('/api/member', {
@@ -50,9 +60,13 @@
             body: JSON.stringify(data)
         });
 
-        if(response.ok) {
+        if (response.ok) {
             alert('교인 정보가 등록되었습니다.');
             location.reload();
+        } else {
+            // 서버에서 에러(400 Bad Request 등)가 넘어왔을 때의 처리
+            const errorMsg = await response.text();
+            alert('등록 실패: ' + errorMsg);
         }
     }
 </script>

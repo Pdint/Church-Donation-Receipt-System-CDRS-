@@ -8,8 +8,7 @@ import lombok.NoArgsConstructor;
 @Setter
 @NoArgsConstructor
 public class DonationRequest {
-    private String name;          // 관리자가 화면에서 입력한 교인 성함
-    private String birthDate;     // 관리자가 화면에서 입력한 교인 생년월일(6자리)
-    private Long amount;          // 기부(헌금) 금액
-    private String donationDate;  // 정산 날짜 (예: "2026-05-19")
+    private String memberId;      // 👈 이름, 생일, 전화번호 3개가 ID 딱 1개로 압축됨!
+    private Long amount;
+    private String donationDate;
 }

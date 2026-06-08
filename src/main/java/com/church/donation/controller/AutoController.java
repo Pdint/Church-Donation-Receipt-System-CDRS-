@@ -8,6 +8,6 @@ public class AutoController {
 
     @GetMapping("/")
     public String home() {
-        return "redirect:/CDRS.html";
+        return "redirect:/index.html";
     }
 }

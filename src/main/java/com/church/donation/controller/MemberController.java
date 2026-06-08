@@ -8,6 +8,8 @@ import com.church.donation.repository.MemberRepository;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.http.ResponseEntity;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/member")
 public class MemberController {
@@ -35,5 +37,11 @@ public class MemberController {
 
         // 200 OK 반환
         return ResponseEntity.ok("OK");
+    }
+
+    // 프론트엔드 콤보박스(Select)용 교인 전체 목록 조회 API 추가
+    @GetMapping("/api/members/all")
+    public ResponseEntity<List<Member>> getAllMembers() {
+        return ResponseEntity.ok(memberRepository.findAll());
     }
 }

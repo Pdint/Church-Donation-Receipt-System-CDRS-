@@ -21,12 +21,14 @@ public class SecurityConfig {
                         .requestMatchers(
                                 "/CDRS.html",         // 메인 화면
                                 "/receipt/**",        // 영수증 화면 (예: /receipt/123, /receipt/search 등)
-                                "/donation/**",       // 혹시 기부금 결제/입력 화면이 있다면 여기도 열어주세요
                                 "/login",             // 관리자 로그인 화면
-                                "/favicon.ico",
+                                "/favicon.ico", "/error",
                                 "/",                  //첫 링크
                                 "/css/**", "/js/**", "/images/**",
-                                "/*.css", "/*.js", "/*.png", "/*.jpg"  // 디자인 파일들이 깨지지 않도록 통행 허용!
+                                "/*.css", "/*.js", "/*.png", "/*.jpg",// 디자인 파일들이 깨지지 않도록 통행 허용!
+                                "/api/auth/**", //인증절차 진행 하기 위한 길 터주기
+                                "/prayer-board" ,"/api/prayers/**", //중보기도 보안 열어주기
+                                "/index.html" // 대문 페이지 얼어주기
                         ).permitAll()
                         // 🔒 그 외의 모든 화면(대시보드, 교인 목록 등)은 무조건 로그인 필수!
                         .anyRequest().authenticated()

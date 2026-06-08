@@ -41,38 +41,83 @@
 <table id="donationTable">
     <thead>
     <tr>
-        <th>성함</th>
-        <th>생년월일</th>
-        <th>기부 금액</th>
+        <th>교인 선택</th>
+        <th>헌금 종류</th> <th>기부 금액</th>
     </tr>
     </thead>
     <tbody id="donationBody">
     <tr>
-        <td><label>
-            <input type="text" class="name" placeholder="성함">
-        </label></td>
-        <td><label>
-            <input type="text" class="birthDate" placeholder="6자리 (예: 900101)">
-        </label></td>
-        <td><label>
-            <input type="number" class="amount" placeholder="금액">
-        </label></td>
+        <td>
+            <label>
+                <select class="memberIdSelect" style="width: 100%; padding: 5px;">
+                    <option value="">-- 로딩 중... --</option>
+                </select>
+            </label>
+        </td>
+        <td>
+            <label>
+                <select class="donationTypeSelect" style="width: 100%; padding: 5px;">
+                    <option value="">-- 로딩 중... --</option>
+                </select>
+            </label>
+        </td>
+        <td><label><input type="number" class="amount" placeholder="금액"></label></td>
     </tr>
     </tbody>
 </table>
 
 <script>
+    let memberOptionsHTML = '<option value="">-- 교인을 선택하세요 --</option>';
+    let categoryOptionsHTML = '<option value="">-- 헌금 종류 --</option>'; // 👈 카테고리 HTML 변수 추가
+
+    document.addEventListener('DOMContentLoaded', async () => {
+        try {
+            // 1. 교인 목록 불러오기
+            const memberRes = await fetch('/api/members/all');
+            const members = await memberRes.json();
+            members.forEach(m => {
+                memberOptionsHTML += `<option value="${m.memberId}">${m.name} (${m.birthDate})</option>`;
+            });
+
+            // 2. 헌금 종류 불러오기 👈 추가됨!
+            const categoryRes = await fetch('/api/categories/all');
+            const categories = await categoryRes.json();
+            categories.forEach(c => {
+                categoryOptionsHTML += `<option value="${c.name}">${c.name}</option>`; // 값으로 헌금 이름(String)을 씁니다.
+            });
+
+            // 첫 번째 콤보박스들에 데이터 삽입
+            document.querySelector('.memberIdSelect').innerHTML = memberOptionsHTML;
+            document.querySelector('.donationTypeSelect').innerHTML = categoryOptionsHTML;
+
+        } catch (e) {
+            console.error('데이터를 불러오는데 실패했습니다.', e);
+        }
+    });
+
+    // 행 추가 시 교인 목록과 헌금 종류 목록 모두 복사
     function addRow() {
         const tbody = document.getElementById('donationBody');
-        const newRow = tbody.rows[0].cloneNode(true);
-        // 입력값 초기화
-        const inputs = newRow.getElementsByTagName('input');
-        for(let i=0; i<inputs.length; i++) inputs[i].value = '';
+        const newRow = document.createElement('tr');
+
+        newRow.innerHTML = `
+            <td>
+                <select class="memberIdSelect" style="width: 100%; padding: 5px;">
+                    ${memberOptionsHTML}
+                </select>
+            </td>
+            <td>
+                <select class="donationTypeSelect" style="width: 100%; padding: 5px;">
+                    ${categoryOptionsHTML}
+                </select>
+            </td>
+            <td><input type="number" class="amount" placeholder="금액"></td>
+        `;
         tbody.appendChild(newRow);
     }
 
+    // 서버로 전송
     async function submitDonations() {
-        // 날짜 검증
         const dateInput = document.getElementById('settlementDate').value;
         if (!dateInput) {
             alert('정산(기부) 날짜를 먼저 선택해주세요!');
@@ -80,23 +125,24 @@
         }
 
         const rows = document.querySelectorAll('#donationBody tr');
+
+        // 👈 donationType 데이터 수집 추가
         const data = Array.from(rows).map(row => ({
-            name: row.querySelector('.name').value,
-            birthDate: row.querySelector('.birthDate').value,
+            memberId: row.querySelector('.memberIdSelect').value,
+            donationType: row.querySelector('.donationTypeSelect').value,
             amount: parseInt(row.querySelector('.amount').value),
-            donationDate: dateInput // 공통 날짜 적용
+            donationDate: dateInput
         }));
 
-        // 빈 값 검증
         for (let req of data) {
-            if (!req.name || !req.birthDate || isNaN(req.amount)) {
-                alert('모든 칸(성함, 생년월일, 금액)을 정확히 입력해주세요.');
+            if (!req.memberId || !req.donationType || isNaN(req.amount)) {
+                alert('교인, 헌금 종류, 금액을 모두 정확히 입력해주세요.');
                 return;
             }
         }
 
         try {
-            const response = await fetch('/api/donation/batch', {
+            const response = await fetch('/api/donations/batch', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(data)

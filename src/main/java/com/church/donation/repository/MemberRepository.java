@@ -4,6 +4,7 @@ import com.church.donation.domain.Member;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface MemberRepository extends JpaRepository<Member, String> {
@@ -11,4 +12,7 @@ public interface MemberRepository extends JpaRepository<Member, String> {
 
     // 성함(name)과 생년월일(birthDate)을 동시에 만족하는 교인 검색 (동명이인이 있을 수 있기 떄문에 List 반환)
     List<Member> findByNameAndBirthDate(String name, String birthDate);
+
+
+    Optional<Member> findByNameAndBirthDateAndPhone(String name, String birthDate, String phone);
 }

@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>월별 중보 기도 릴레이</title>
+    <style>
+        body {
+            font-family: 'Malgun Gothic', '맑은 고딕', sans-serif;
+            background-color: #f4f7f6;
+            margin: 0; padding: 20px;
+            display: flex; justify-content: center;
+        }
+        .board-container {
+            width: 100%; max-width: 800px;
+            background: white; padding: 30px;
+            border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+
+        /* 헤더 및 월 이동 버튼 */
+        .header-area {
+            text-align: center; margin-bottom: 30px;
+        }
+        .header-area h2 { color: #2c3e50; margin-bottom: 5px; }
+        .month-selector {
+            display: flex; justify-content: center; align-items: center; gap: 15px;
+            font-size: 20px; font-weight: bold; color: #34495e;
+        }
+        .btn-month {
+            background: none; border: none; font-size: 20px; cursor: pointer; color: #3498db;
+        }
+
+        /* 기도제목 작성 폼 */
+        .write-box {
+            background: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 30px;
+            border-left: 4px solid #3498db;
+        }
+        .input-group { display: flex; gap: 10px; margin-bottom: 10px; }
+        .input-group input {
+            flex: 1; padding: 10px; border: 1px solid #ddd; border-radius: 4px;
+        }
+        .write-box textarea {
+            width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px;
+            box-sizing: border-box; resize: vertical; height: 80px; margin-bottom: 10px;
+        }
+        .btn-submit {
+            background: #3498db; color: white; border: none; padding: 10px 20px;
+            border-radius: 4px; cursor: pointer; font-weight: bold; width: 100%;
+        }
+
+        /* 기도제목 리스트 */
+        .prayer-card {
+            border-bottom: 1px solid #eee; padding: 15px 0; position: relative;
+        }
+        .prayer-card:last-child { border-bottom: none; }
+        .prayer-info { font-size: 13px; color: #7f8c8d; margin-bottom: 8px; }
+        .prayer-info strong { color: #2c3e50; font-size: 15px; margin-right: 10px; }
+        .prayer-content { font-size: 15px; line-height: 1.6; color: #444; white-space: pre-wrap; }
+
+        .btn-delete {
+            position: absolute; top: 15px; right: 0;
+            background: none; border: 1px solid #e74c3c; color: #e74c3c;
+            padding: 3px 8px; border-radius: 4px; font-size: 12px; cursor: pointer;
+        }
+        .btn-delete:hover { background: #e74c3c; color: white; }
+
+        /* 비밀번호 확인 모달 (삭제 시 사용) */
+        .modal-overlay {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5); justify-content: center; align-items: center; z-index: 1000;
+        }
+        .modal-content {
+            background: white; padding: 25px; border-radius: 8px; width: 300px; text-align: center;
+        }
+        .modal-content input {
+            width: 90%; padding: 10px; margin: 15px 0; border: 1px solid #ddd; border-radius: 4px; text-align: center;
+        }
+        .modal-buttons { display: flex; gap: 10px; justify-content: center; }
+        .modal-buttons button { padding: 8px 15px; border: none; border-radius: 4px; cursor: pointer; }
+        .btn-confirm { background: #e74c3c; color: white; }
+        .btn-cancel { background: #95a5a6; color: white; }
+    </style>
+</head>
+<body>
+
+<div class="board-container">
+
+    <div class="header-area">
+        <h2>🙏 중보 기도 릴레이</h2>
+        <div class="month-selector">
+            <button class="btn-month" onclick="changeMonth(-1)">◀</button>
+            <span id="currentMonthDisplay">2026년 06월</span>
+            <button class="btn-month" onclick="changeMonth(1)">▶</button>
+        </div>
+    </div>
+
+    <div class="write-box">
+        <div class="input-group">
+            <input type="text" id="authorName" placeholder="작성자 이름">
+            <input type="password" id="password" placeholder="비밀번호 (수정/삭제용 숫자 4자리)" maxlength="4">
+        </div>
+        <textarea id="content" placeholder="함께 나눌 기도 제목을 적어주세요."></textarea>
+        <button class="btn-submit" onclick="submitPrayer()">기도 제목 올리기</button>
+    </div>
+
+    <div id="prayerListContainer">
+        <div style="text-align: center; color: #999; padding: 20px;">기도 제목을 불러오는 중입니다...</div>
+    </div>
+</div>
+
+<div class="modal-overlay" id="deleteModal">
+    <div class="modal-content">
+        <h3>글 삭제</h3>
+        <p style="font-size: 13px; color: #666;">작성 시 입력한 비밀번호를 입력하세요.<br>(관리자는 바로 삭제됩니다)</p>
+        <input type="password" id="deletePassword" placeholder="비밀번호 입력">
+        <input type="hidden" id="deleteTargetId">
+        <div class="modal-buttons">
+            <button class="btn-cancel" onclick="closeModal()">취소</button>
+            <button class="btn-confirm" onclick="executeDelete()">삭제하기</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // 현재 보고 있는 기준 월 (초기값: 2026-06)
+    let targetYear = 2026;
+    let targetMonth = 6;
+
+    // 페이지 로드 시 즉시 데이터 불러오기
+    window.onload = function() {
+        updateMonthDisplay();
+        loadPrayers();
+    };
+
+    // [이동] 이전 달 / 다음 달 버튼 처리
+    function changeMonth(offset) {
+        targetMonth += offset;
+        if (targetMonth > 12) { targetMonth = 1; targetYear++; }
+        if (targetMonth < 1) { targetMonth = 12; targetYear--; }
+        updateMonthDisplay();
+        loadPrayers();
+    }
+
+    // [UI] 월 표시 업데이트 및 백엔드용 YYYY-MM 포맷 생성
+    function updateMonthDisplay() {
+        let monthStr = targetMonth < 10 ? '0' + targetMonth : targetMonth;
+        document.getElementById('currentMonthDisplay').innerText = `${targetYear}년 ${monthStr}월`;
+    }
+
+    function getFormattedMonth() {
+        let monthStr = targetMonth < 10 ? '0' + targetMonth : targetMonth;
+        return `${targetYear}-${monthStr}`;
+    }
+
+    // ==========================================
+    // 🔗 백엔드 API 연동 함수들 (이후 생성할 컨트롤러와 매칭)
+    // ==========================================
+
+    // [API - 조회] 해당 월의 기도제목 불러오기
+    async function loadPrayers() {
+        const monthStr = getFormattedMonth();
+        // 백엔드 API 타격 (아직 없으므로 404가 뜨는 것이 정상입니다!)
+        try {
+            const response = await fetch(`/api/prayers?month=${monthStr}`);
+            if (response.ok) {
+                const prayers = await response.json();
+                renderPrayerList(prayers);
+            } else {
+                document.getElementById('prayerListContainer').innerHTML = '<div style="text-align: center; color: #e74c3c; padding: 20px;">데이터를 불러오지 못했습니다.</div>';
+            }
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
+    // [UI] 불러온 데이터를 HTML 카드로 그려주기
+    function renderPrayerList(prayers) {
+        const container = document.getElementById('prayerListContainer');
+        container.innerHTML = ''; // 기존 리스트 비우기
+
+        if (prayers.length === 0) {
+            container.innerHTML = '<div style="text-align: center; color: #999; padding: 20px;">등록된 기도 제목이 없습니다. 첫 번째로 작성해 보세요!</div>';
+            return;
+        }
+
+        prayers.forEach(p => {
+            const card = document.createElement('div');
+            card.className = 'prayer-card';
+            card.innerHTML = `
+                <div class="prayer-info">
+                    <strong>${p.authorName}</strong> <span>${p.createdDate || '방금 전'}</span>
+                </div>
+                <div class="prayer-content">${p.content}</div>
+                <button class="btn-delete" onclick="openDeleteModal(${p.id})">삭제</button>
+            `;
+            container.appendChild(card);
+        });
+    }
+
+    // [API - 저장] 새 기도제목 올리기
+    async function submitPrayer() {
+        const name = document.getElementById('authorName').value;
+        const pwd = document.getElementById('password').value;
+        const content = document.getElementById('content').value;
+
+        if (!name || !pwd || !content) {
+            alert("이름, 비밀번호, 내용을 모두 입력해주세요!");
+            return;
+        }
+
+        const requestData = {
+            authorName: name,
+            password: pwd,
+            content: content,
+            targetMonth: getFormattedMonth() // "2026-06" 형태로 서버에 전송
+        };
+
+        try {
+            const response = await fetch('/api/prayers', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(requestData)
+            });
+
+            if (response.ok) {
+                alert("기도 제목이 등록되었습니다.");
+                // 입력창 초기화
+                document.getElementById('content').value = '';
+                document.getElementById('password').value = '';
+                // 목록 다시 불러오기
+                loadPrayers();
+            } else {
+                alert("등록 실패!");
+            }
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
+    // ==========================================
+    // 🗑️ 삭제 관련 모달 및 API
+    // ==========================================
+    function openDeleteModal(id) {
+        document.getElementById('deleteTargetId').value = id;
+        document.getElementById('deletePassword').value = '';
+        document.getElementById('deleteModal').style.display = 'flex';
+    }
+
+    function closeModal() {
+        document.getElementById('deleteModal').style.display = 'none';
+    }
+
+    // [API - 삭제] 비밀번호 검증 후 삭제 요청
+    async function executeDelete() {
+        const id = document.getElementById('deleteTargetId').value;
+        const pwd = document.getElementById('deletePassword').value;
+
+        if (!pwd) { alert("비밀번호를 입력해주세요."); return; }
+
+        try {
+            // 삭제 시 비밀번호를 바디(body)에 담아서 POST로 검증 요청
+            const response = await fetch(`/api/prayers/${id}/delete`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ password: pwd })
+            });
+
+            if (response.ok) {
+                alert("삭제되었습니다.");
+                closeModal();
+                loadPrayers(); // 목록 새로고침
+            } else {
+                const errorMsg = await response.text();
+                alert(errorMsg || "비밀번호가 일치하지 않거나 권한이 없습니다.");
+            }
+        } catch (error) {
+            console.error(error);
+        }
+    }
+</script>
+
+</body>
+</html>

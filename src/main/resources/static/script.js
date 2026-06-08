@@ -7,7 +7,8 @@ let timerInterval;
  */
 async function sendSms() {
     const name = document.getElementById("name").value;
-    // 👈 문자 발송 시에도 하이픈 제거
+    const birth = document.getElementById("birth").value;
+    // 문자 발송 시에도 하이픈 제거
     const phone = document.getElementById("phone").value.replace(/-/g, '');
 
     if (!name || !phone) {
@@ -22,6 +23,7 @@ async function sendSms() {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 name: name,
+                birthDate: birth,
                 phone: phone
             })
         });
@@ -99,7 +101,12 @@ async function verifyCode() {
             const memberData = await response.json();
 
             alert("인증되었습니다! 기부금 영수증 페이지로 이동합니다.");
-            window.location.href = `/receipt/${memberData.memberId}?year=2026`;
+
+            // 💡 [핵심 수정] HTML에서 사용자가 선택한 연도 값을 동적으로 읽어옵니다.
+            const selectedYear = document.getElementById("receiptYear").value;
+
+            // 읽어온 연도(selectedYear)를 주소창에 dynamic하게 꽂아줍니다!
+            window.location.href = `/receipt?memberId=${memberData.memberId}&year=${selectedYear}`;
 
         } else {
             alert("입력하신 정보와 일치하는 교인이 없거나 인증번호가 올바르지 않습니다.");

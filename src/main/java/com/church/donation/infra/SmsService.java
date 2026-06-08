@@ -33,17 +33,13 @@ public class SmsService {
         message.setText("인증번호 [" + code + "]를 입력해주세요.");
 
         try {
-            // 실제 발송 메소드 호출
             messageService.send(message);
             System.out.println("✅ 문자 발송 성공: " + phone);
 
-        } catch (SolapiMessageNotReceivedException exception) {
-            // 발송 실패 시 상세 목록 확인
-            System.out.println("❌ 발송 실패 메시지 목록: " + exception.getFailedMessageList());
-            System.out.println("에러 메시지: " + exception.getMessage());
         } catch (Exception exception) {
-            // 기타 일반 예외 처리
             System.out.println("❌ 시스템 오류: " + exception.getMessage());
+            throw new RuntimeException("문자 발송 실패 (Solapi 오류): " + exception.getMessage());
         }
     }
+
 }

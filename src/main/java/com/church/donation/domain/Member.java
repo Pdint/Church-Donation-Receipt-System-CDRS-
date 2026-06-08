@@ -2,10 +2,12 @@ package com.church.donation.domain;
 
 import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.Setter; // 👈 이거 하나면 수많은 set 메서드가 자동 생성됩니다!
 import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
+@Setter // 👈 추가 완료!
 @NoArgsConstructor
 public class Member extends BaseTimeEntity {
 

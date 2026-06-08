@@ -11,6 +11,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import com.church.donation.service.ExcelService;
 
 import java.io.IOException;
 import java.security.Principal;
@@ -26,6 +27,7 @@ public class AdminController {
     private final PasswordEncoder passwordEncoder;
     private final ChurchInfoRepository churchInfoRepository;
     private final ApiSettingsRepository apiSettingsRepository; // api 주입 추가
+    private final ExcelService excelService; // 서비스 계층 주입 추가
 
     // 1. 웹 페이지에서 교인 명부 표로 보기
     @GetMapping("/admin/members")
@@ -36,42 +38,7 @@ public class AdminController {
     }
 
     // 2. 엑셀 다운로드 버튼을 눌렀을 때 실행되는 기능
-    @GetMapping("/admin/members/excel")
-    public void downloadExcel(HttpServletResponse response) throws IOException {
-        List<Member> members = memberRepository.findAll();
 
-        // 빈 엑셀 파일 생성
-        Workbook workbook = new XSSFWorkbook();
-        Sheet sheet = workbook.createSheet("교인 명부");
-        Row headerRow = sheet.createRow(0);
-
-        // 첫 번째 줄(헤더) 제목 달기
-        headerRow.createCell(0).setCellValue("교인 ID");
-        headerRow.createCell(1).setCellValue("이름");
-        headerRow.createCell(2).setCellValue("생년월일");
-        headerRow.createCell(3).setCellValue("전화번호");
-        headerRow.createCell(4).setCellValue("가입일자");
-
-        // DB 데이터 엑셀에 채워 넣기
-        int rowNum = 1;
-        for (Member member : members) {
-            Row row = sheet.createRow(rowNum++);
-            row.createCell(0).setCellValue(member.getMemberId());
-            row.createCell(1).setCellValue(member.getName());
-            row.createCell(2).setCellValue(member.getBirthDate());
-            row.createCell(3).setCellValue(member.getPhone());
-            // 시간이 널(null)이 아니면 문자열로 변환해서 넣기
-            row.createCell(4).setCellValue(member.getCreatedAt() != null ? member.getCreatedAt().toString() : "");
-        }
-
-        // 브라우저가 "아, 이건 엑셀 파일 다운로드구나!" 하고 인식하게 만드는 설정
-        response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
-        response.setHeader("Content-Disposition", "attachment; filename=members.xlsx");
-
-        // 엑셀 파일 내보내기
-        workbook.write(response.getOutputStream());
-        workbook.close();
-    }
         // ==========================================
         // 헌금 내역 표로 보기
         // ==========================================
@@ -85,35 +52,15 @@ public class AdminController {
         // ==========================================
         //  헌금 내역 엑셀 다운로드
         // ==========================================
-        @GetMapping("/admin/donations/excel")
-        public void downloadDonationExcel(HttpServletResponse response) throws IOException {
-            List<Donation> donations = donationRepository.findAll();
+        @GetMapping("/admin/excel/members")
+    public void downloadMembersExcel(HttpServletResponse response) throws IOException {
+        // 복잡한 로직은 모두 Service로 위임! (단일 책임 원칙)
+        excelService.exportMembersToExcel(response);
+    }
 
-            Workbook workbook = new XSSFWorkbook();
-            Sheet sheet = workbook.createSheet("헌금 내역");
-            Row headerRow = sheet.createRow(0);
-
-            // 첫 번째 줄(헤더) 제목 달기
-            headerRow.createCell(0).setCellValue("교인 ID");
-            headerRow.createCell(1).setCellValue("기부 금액(원)");
-            headerRow.createCell(2).setCellValue("기부 날짜");
-            headerRow.createCell(3).setCellValue("시스템 기록 시간");
-
-            // DB 데이터 엑셀에 채워 넣기
-            int rowNum = 1;
-            for (Donation donation : donations) {
-                Row row = sheet.createRow(rowNum++);
-                row.createCell(0).setCellValue(donation.getMemberId());
-                row.createCell(1).setCellValue(donation.getAmount());
-                row.createCell(2).setCellValue(donation.getDonationDate() != null ? donation.getDonationDate().toString() : "");
-                row.createCell(3).setCellValue(donation.getCreatedAt() != null ? donation.getCreatedAt().toString() : "");
-            }
-
-            response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
-            response.setHeader("Content-Disposition", "attachment; filename=donations.xlsx");
-
-            workbook.write(response.getOutputStream());
-            workbook.close();
+    @GetMapping("/admin/excel/donations")
+    public void downloadDonationsExcel(HttpServletResponse response) throws IOException {
+        excelService.exportDonationsToExcel(response);
     }
     @GetMapping("/login")
     public String loginPage() {

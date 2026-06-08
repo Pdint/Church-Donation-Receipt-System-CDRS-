@@ -40,7 +40,12 @@
         <td th:text="${member.phone}"></td>
         <td th:text="${#temporals.format(member.createdAt, 'yyyy-MM-dd HH:mm')}"></td>
         <td>
-            <button th:onclick="|openEditModal('${member.memberId}', '${member.name}', '${member.birthDate}', '${member.phone}')|">
+            <button th:data-id="${member.memberId}"
+                    th:data-name="${member.name}"
+                    th:data-birth="${member.birthDate}"
+                    th:data-phone="${member.phone}"
+                    onclick="openEditModal(this.getAttribute('data-id'), this.getAttribute('data-name'), this.getAttribute('data-birth'), this.getAttribute('data-phone'))"
+                    style="background-color: #3498db; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-weight: bold; margin-right: 5px;">
                 수정
             </button>
             <form th:action="@{/admin/members/delete/{id}(id=${member.memberId})}" method="post" style="display:inline;">

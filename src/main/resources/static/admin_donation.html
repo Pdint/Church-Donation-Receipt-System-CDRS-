@@ -67,35 +67,61 @@
 </table>
 
 <script>
-    let memberOptionsHTML = '<option value="">-- 교인을 선택하세요 --</option>';
-    let categoryOptionsHTML = '<option value="">-- 헌금 종류 --</option>'; // 👈 카테고리 HTML 변수 추가
+    // 💡 서버에서 받아온 데이터를 저장해둘 전역 변수
+    let membersData = [];
+    let categoriesData = [];
 
-    document.addEventListener('DOMContentLoaded', async () => {
+    // 1. 페이지가 로드되자마자 실행되는 함수
+    window.onload = async function() {
         try {
-            // 1. 교인 목록 불러오기
-            const memberRes = await fetch('/api/members/all');
-            const members = await memberRes.json();
-            members.forEach(m => {
-                memberOptionsHTML += `<option value="${m.memberId}">${m.name} (${m.birthDate})</option>`;
-            });
-
-            // 2. 헌금 종류 불러오기 👈 추가됨!
+            // 🚨 [핵심 수정] 주소 끝에 반드시 /all 이 붙어있어야 합니다!
+            const memberRes = await fetch('/api/admin/members/all');
             const categoryRes = await fetch('/api/categories/all');
-            const categories = await categoryRes.json();
-            categories.forEach(c => {
-                categoryOptionsHTML += `<option value="${c.name}">${c.name}</option>`; // 값으로 헌금 이름(String)을 씁니다.
-            });
 
-            // 첫 번째 콤보박스들에 데이터 삽입
-            document.querySelector('.memberIdSelect').innerHTML = memberOptionsHTML;
-            document.querySelector('.donationTypeSelect').innerHTML = categoryOptionsHTML;
+            if (memberRes.ok) {
+                membersData = await memberRes.json();
+            } else {
+                console.error("교인 목록을 불러오지 못했습니다.");
+            }
 
-        } catch (e) {
-            console.error('데이터를 불러오는데 실패했습니다.', e);
+            if (categoryRes.ok) {
+                categoriesData = await categoryRes.json();
+            } else {
+                console.error("헌금 종류를 불러오지 못했습니다.");
+            }
+
+            // 2. 데이터를 무사히 가져왔다면, 화면에 있는 첫 번째 드롭다운에 데이터를 채워줍니다.
+            const firstRow = document.querySelector('#donationBody tr');
+            if (firstRow) {
+                populateDropdowns(firstRow);
+            }
+
+        } catch (error) {
+            console.error("데이터 통신 중 에러 발생:", error);
         }
-    });
+    };
 
-    // 행 추가 시 교인 목록과 헌금 종류 목록 모두 복사
+    // 3. 특정 줄(tr)의 드롭다운을 실제 데이터로 채워주는 마법의 함수
+    function populateDropdowns(row) {
+        const memberSelect = row.querySelector('.memberIdSelect');
+        const typeSelect = row.querySelector('.donationTypeSelect');
+
+        // 교인 목록 드롭다운 채우기
+        memberSelect.innerHTML = '<option value="">-- 교인 선택 --</option>';
+        membersData.forEach(m => {
+            // value에는 ID(M9999)를 넣고, 화면에는 이름과 ID를 같이 보여줍니다.
+            memberSelect.innerHTML += `<option value="${m.memberId}">${m.name} (${m.memberId})</option>`;
+        });
+
+        // 헌금 종류 드롭다운 채우기
+        typeSelect.innerHTML = '<option value="">-- 헌금 종류 --</option>';
+        categoriesData.forEach(c => {
+            // value와 화면 모두 헌금 이름(십일조, 감사헌금 등)을 넣습니다.
+            typeSelect.innerHTML += `<option value="${c.name}">${c.name}</option>`;
+        });
+    }
+
+    // 4. [ + 내역 추가 ] 버튼을 누를 때마다 새로운 줄을 만드는 함수
     function addRow() {
         const tbody = document.getElementById('donationBody');
         const newRow = document.createElement('tr');
@@ -103,20 +129,33 @@
         newRow.innerHTML = `
             <td>
                 <select class="memberIdSelect" style="width: 100%; padding: 5px;">
-                    ${memberOptionsHTML}
+                    <option value="">로딩중...</option>
                 </select>
             </td>
             <td>
                 <select class="donationTypeSelect" style="width: 100%; padding: 5px;">
-                    ${categoryOptionsHTML}
+                    <option value="">로딩중...</option>
                 </select>
             </td>
-            <td><input type="number" class="amount" placeholder="금액"></td>
+            <td><input type="number" class="amount" placeholder="예: 50000" min="0"></td>
+            <td>
+                <button type="button" onclick="removeRow(this)" style="background-color: #e74c3c; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;">삭제</button>
+            </td>
         `;
+
         tbody.appendChild(newRow);
+
+        // 💡 [중요] 새로 추가된 줄에도 교인과 헌금 종류 데이터를 꽉꽉 채워줍니다!
+        populateDropdowns(newRow);
     }
 
-    // 서버로 전송
+    // 5. [ 삭제 ] 버튼을 누르면 해당 줄을 지우는 함수
+    function removeRow(button) {
+        const row = button.closest('tr');
+        row.remove();
+    }
+
+    // 6. [ 서버로 저장 ] 기존에 있던 submitDonations 함수 (이름이 같다면 그대로 유지)
     async function submitDonations() {
         const dateInput = document.getElementById('settlementDate').value;
         if (!dateInput) {
@@ -125,8 +164,6 @@
         }
 
         const rows = document.querySelectorAll('#donationBody tr');
-
-        // 👈 donationType 데이터 수집 추가
         const data = Array.from(rows).map(row => ({
             memberId: row.querySelector('.memberIdSelect').value,
             donationType: row.querySelector('.donationTypeSelect').value,
@@ -136,7 +173,7 @@
 
         for (let req of data) {
             if (!req.memberId || !req.donationType || isNaN(req.amount)) {
-                alert('교인, 헌금 종류, 금액을 모두 정확히 입력해주세요.');
+                alert('교인, 헌금 종류, 금액을 모두 정확히 선택/입력해주세요.');
                 return;
             }
         }
@@ -149,14 +186,13 @@
             });
 
             if (response.ok) {
-                alert('모든 내역이 성공적으로 저장되었습니다!');
+                alert('모든 헌금 내역이 성공적으로 저장되었습니다!');
                 location.reload();
             } else {
                 const errorText = await response.text();
                 alert('저장 실패: ' + errorText);
             }
         } catch (error) {
-            alert('서버 통신 오류가 발생했습니다.');
             console.error(error);
         }
     }
